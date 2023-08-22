@@ -24,7 +24,7 @@ jobs:
       - name: Run SSL Expiry Check and Notify Slack
         run: |
           echo "Running SSL Expiry Check"
-          node /Day3-task/.github/scripts/ssl_expiry_check_script.js
+          node /home/runner/work/Day3-task/Day3-task/.github/scripts/ssl_expiry_check_script.js
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
