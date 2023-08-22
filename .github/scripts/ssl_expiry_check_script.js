@@ -44,6 +44,9 @@ async function main() {
 
     for (const domain of domainList) {
       const sslInfo = await getSSLCertificateInfo(domain);
+      console.log(`Domain: ${domain}`);
+      console.log(`Days Until Expiry: ${sslInfo.daysUntilExpiry}`);
+
       if (sslInfo.daysUntilExpiry <= 30) {
         await sendSlackAlert(domain, sslInfo.daysUntilExpiry);
       }
