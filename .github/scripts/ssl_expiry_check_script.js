@@ -5,6 +5,38 @@ const { exec } = require('child_process');
 
 const execPromise = promisify(exec);
 
+async function getSSLCertificateInfo(domain) {
+  const { stdout, stderr } = await execPromise(`openssl s_client -connect ${domain}:443 -servername ${domain} < /dev/null 2>/dev/null | openssl x509 -text -noout`);
+  
+  // Extract certificate expiration information from the output
+  const expirationMatch = /Not After : (.+)/.exec(stdout);
+  if (expirationMatch) {
+    const expirationDate = new Date(expirationMatch[1]);
+    const currentDate = new Date();
+    const daysUntilExpiry = Math.ceil((expirationDate - currentDate) / (1000 * 60 * 60 * 24));
+    
+    return { daysUntilExpiry };
+  }
+  
+  return { daysUntilExpiry: -1 }; // Return -1 if expiration information couldn't be retrieved
+}
+
+async function sendSlackAlert(domain, daysUntilExpiry) {
+  const slackToken = process.env.SLACK_WEBHOOK_URL;
+
+  const slackMessage = `SSL Expiry Alert\n   * Domain : ${domain}\n   * Warning : The SSL certificate for ${domain} will expire in ${daysUntilExpiry} days.`;
+
+  try {
+    await axios.post(slackToken, {
+      text: slackMessage,
+    });
+
+    console.log(`Slack alert sent for ${domain}`);
+  } catch (error) {
+    console.error(`Error sending Slack alert for ${domain}:`, error);
+  }
+}
+
 async function main() {
   try {
     const domains = await fs.readFile('domains.txt', 'utf-8');
@@ -18,29 +50,6 @@ async function main() {
     }
   } catch (error) {
     console.error(error);
-  }
-}
-
-// Function to send Slack alert
-async function sendSlackAlert(domain, daysUntilExpiry) {
-  const slackToken = process.env.SLACK_WEBHOOK_URL;
-
-  // Debugging: Log domain and daysUntilExpiry
-  console.log(`Debug: Domain: ${domain}, Days until expiry: ${daysUntilExpiry}`);
-
-  const slackMessage = `SSL Expiry Alert\n   * Domain : ${domain}\n   * Warning : The SSL certificate for ${domain} will expire in ${daysUntilExpiry} days.`;
-
-  // Debugging: Log the generated slackMessage
-  console.log(`Debug: Slack Message: ${slackMessage}`);
-
-  try {
-    await axios.post(slackToken, {
-      text: slackMessage,
-    });
-
-    console.log(`Slack alert sent for ${domain}`);
-  } catch (error) {
-    console.error(`Error sending Slack alert for ${domain}:`, error);
   }
 }
 
