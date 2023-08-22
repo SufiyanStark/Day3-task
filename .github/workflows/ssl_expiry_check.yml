@@ -20,6 +20,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Print Environment Variables  # Debugging line
+        run: env
+
       - name: Run SSL Expiry Check and Notify Slack
         run: |
           echo "Running SSL Expiry Check"
