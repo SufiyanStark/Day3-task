@@ -1,31 +1,26 @@
-const { WebClient } = require('@slack/web-api');
+const axios = require('axios');
+const { promises: fs } = require('fs');
+const { promisify } = require('util');
+const { exec } = require('child_process');
 
-// Your existing code for checking SSL expiry and sending alerts
-const domains = ['example.com', 'anotherdomain.com'];
-
-async function checkExpiry(domain) {
-  // ... (your existing code)
-}
+const execPromise = promisify(exec);
 
 async function main() {
-  const slackToken = process.env.SLACK_WEBHOOK_URL;
+  try {
+    const domains = await fs.readFile('domains.txt', 'utf-8');
+    const domainList = domains.split('\n').filter(domain => domain.trim() !== '');
 
-  const slack = new WebClient(slackToken);
-
-  for (const domain of domains) {
-    try {
-      const daysUntilExpiry = await checkExpiry(domain);
-
-      // Send Slack alert
-      await slack.chat.postMessage({
-        channel: '#ssl-expiry-alerts', // Replace with your Slack channel
-        text: `SSL Expiry Alert\n   * Domain : ${domain}\n   * Warning : The SSL certificate for ${domain} will expire in ${daysUntilExpiry} days.`,
-      });
-    } catch (error) {
-      console.error(`Error checking SSL expiry for ${domain}:`, error);
+    for (const domain of domainList) {
+      const sslInfo = await getSSLCertificateInfo(domain);
+      if (sslInfo.daysUntilExpiry <= 30) {
+        await sendSlackAlert(domain, sslInfo.daysUntilExpiry);
+      }
     }
+  } catch (error) {
+    console.error(error);
   }
 }
+// Rest of the script (refer to previous responses for full script)
 
 main();
 

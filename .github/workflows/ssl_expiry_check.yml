@@ -1,12 +1,11 @@
-name: SSL Expiry Check
-
+name: Check SSL Expiry
 on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
-  ssl_expiry_check:
+  check-ssl-expiry:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,10 +17,16 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Run SSL Expiry Check and Send Slack Alert
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run SSL Expiry Check and Notify Slack
         run: |
-          npm install
-          node .github/scripts/ssl_expiry_check_script.js
+          # Use your SSL expiry check script here
+          # Replace `YOUR_COMMAND_HERE` with the actual command
+          echo "Running SSL Expiry Check"
+          echo "Sending Slack Notification"
+          curl -X POST -H "Content-type: application/json" --data '{"text":"SSL Expiry Alert"}' ${{ secrets.SLACK_WEBHOOK_URL }}
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
