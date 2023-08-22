@@ -1,7 +1,7 @@
-name: Check SSL Expiry
+name: Check SSL Expiry and Notify Slack
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * *" # Run daily at midnight UTC
   workflow_dispatch:
 
 jobs:
@@ -22,11 +22,20 @@ jobs:
 
       - name: Run SSL Expiry Check and Notify Slack
         run: |
-          # Use your SSL expiry check script here
-          # Replace `YOUR_COMMAND_HERE` with the actual command
           echo "Running SSL Expiry Check"
-          echo "Sending Slack Notification"
-          curl -X POST -H "Content-type: application/json" --data '{"text":"SSL Expiry Alert"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+
+          # Run your SSL expiry check script and capture its output
+          ssl_expiry_result=$(node /Day3-task/.github/scripts/ssl_expiry_check_script.js)
+
+          # Extract domain name and days until expiry from the result
+          domain_name=$(echo "$ssl_expiry_result" | grep -o 'Domain : [^ ]*' | cut -d' ' -f3-)
+          days_until_expiry=$(echo "$ssl_expiry_result" | grep -o 'will expire in [0-9]* days' | cut -d' ' -f4)
+
+          # Format the Slack message
+          slack_message="SSL Expiry Alert\n   * Domain : $domain_name\n   * Warning : The SSL certificate for $domain_name will expire in $days_until_expiry."
+
+          # Send Slack notification using the formatted message
+          curl -X POST -H "Content-type: application/json" --data "{\"text\":\"$slack_message\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
