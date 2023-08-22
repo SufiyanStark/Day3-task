@@ -5,23 +5,6 @@ const { exec } = require('child_process');
 
 const execPromise = promisify(exec);
 
-// Function to send Slack alert
-async function sendSlackAlert(domain, daysUntilExpiry) {
-  const slackToken = process.env.SLACK_WEBHOOK_URL;
-
-  const slackMessage = `SSL Expiry Alert\n   * Domain : ${domain}\n   * Warning : The SSL certificate for ${domain} will expire in ${daysUntilExpiry} days.`;
-
-  try {
-    await axios.post(slackToken, {
-      text: slackMessage,
-    });
-
-    console.log(`Slack alert sent for ${domain}`);
-  } catch (error) {
-    console.error(`Error sending Slack alert for ${domain}:`, error);
-  }
-}
-
 async function main() {
   try {
     const domains = await fs.readFile('domains.txt', 'utf-8');
@@ -35,6 +18,29 @@ async function main() {
     }
   } catch (error) {
     console.error(error);
+  }
+}
+
+// Function to send Slack alert
+async function sendSlackAlert(domain, daysUntilExpiry) {
+  const slackToken = process.env.SLACK_WEBHOOK_URL;
+
+  // Debugging: Log domain and daysUntilExpiry
+  console.log(`Debug: Domain: ${domain}, Days until expiry: ${daysUntilExpiry}`);
+
+  const slackMessage = `SSL Expiry Alert\n   * Domain : ${domain}\n   * Warning : The SSL certificate for ${domain} will expire in ${daysUntilExpiry} days.`;
+
+  // Debugging: Log the generated slackMessage
+  console.log(`Debug: Slack Message: ${slackMessage}`);
+
+  try {
+    await axios.post(slackToken, {
+      text: slackMessage,
+    });
+
+    console.log(`Slack alert sent for ${domain}`);
+  } catch (error) {
+    console.error(`Error sending Slack alert for ${domain}:`, error);
   }
 }
 
