@@ -56,5 +56,8 @@ async function main() {
   }
 }
 
-main();
+// Call the main function and handle unhandled promise rejections
+main().catch(error => {
+  console.error('Unhandled promise rejection:', error);
+});
 
