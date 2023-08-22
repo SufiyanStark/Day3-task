@@ -8,7 +8,6 @@ const execPromise = promisify(exec);
 async function getSSLCertificateInfo(domain) {
   const { stdout, stderr } = await execPromise(`openssl s_client -connect ${domain}:443 -servername ${domain} < /dev/null 2>/dev/null | openssl x509 -text -noout`);
 
-  // Extract certificate expiration information from the output
   const expirationMatch = /Not After : (.+)/.exec(stdout);
   if (expirationMatch) {
     const expirationDate = new Date(expirationMatch[1]);
@@ -18,7 +17,7 @@ async function getSSLCertificateInfo(domain) {
     return { daysUntilExpiry };
   }
 
-  return { daysUntilExpiry: -1 }; // Return -1 if expiration information couldn't be retrieved
+  return { daysUntilExpiry: -1 };
 }
 
 async function sendSlackAlert(domain, daysUntilExpiry) {
@@ -42,27 +41,26 @@ async function main() {
     const domains = await fs.readFile('.github/scripts/domains.txt', 'utf-8');
     const domainList = domains.split('\n').filter(domain => domain.trim() !== '');
 
-    let alertMessage = '';  // To store the combined alert message
+    let alertMessage = '';
 
     for (const domain of domainList) {
       const sslInfo = await getSSLCertificateInfo(domain);
       const domainMessage = `Domain: ${domain}\nDays Until Expiry: ${sslInfo.daysUntilExpiry}`;
-      console.log(domainMessage);  // Print the domain message
-      alertMessage += domainMessage + '\n\n';  // Combine messages with line breaks
+      console.log(domainMessage);
+      alertMessage += domainMessage + '\n\n';
       if (sslInfo.daysUntilExpiry <= 30) {
         await sendSlackAlert(domain, sslInfo.daysUntilExpiry);
       }
     }
 
-    return alertMessage;  // Return the combined alert message
+    return alertMessage.trim();
   } catch (error) {
     console.error(error);
   }
 }
 
-// Call the main function and handle unhandled promise rejections
 main().then(alertMessage => {
-  console.log(alertMessage);  // Print the combined alert message
+  console.log(alertMessage);
 }).catch(error => {
   console.error('Unhandled promise rejection:', error);
 });
