@@ -1,4 +1,5 @@
 name: Check SSL Expiry
+
 on:
   schedule:
     - cron: "0 0 * * *"
@@ -20,14 +21,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Print Environment Variables  # Debugging line
-        run: env
-
       - name: Run SSL Expiry Check and Notify Slack
         run: |
           echo "Running SSL Expiry Check"
-          node /home/runner/work/Day3-task/Day3-task/.github/scripts/ssl_expiry_check_script.js
-          echo "Script finished"
+          node /home/ec2-user/Day3-task/.github/scripts/ssl_expiry_check_script.js
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
