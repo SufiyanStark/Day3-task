@@ -39,25 +39,31 @@ async function sendSlackAlert(domain, daysUntilExpiry) {
 
 async function main() {
   try {
-    const domains = await fs.readFile('/home/ec2-user/Day3-task/.github/scripts/domains.txt', 'utf-8');
+    const domains = await fs.readFile('.github/scripts/domains.txt', 'utf-8');
     const domainList = domains.split('\n').filter(domain => domain.trim() !== '');
+
+    let alertMessage = '';  // To store the combined alert message
 
     for (const domain of domainList) {
       const sslInfo = await getSSLCertificateInfo(domain);
-      console.log(`Domain: ${domain}`);
-      console.log(`Days Until Expiry: ${sslInfo.daysUntilExpiry}`);
-
+      const domainMessage = `Domain: ${domain}\nDays Until Expiry: ${sslInfo.daysUntilExpiry}`;
+      console.log(domainMessage);  // Print the domain message
+      alertMessage += domainMessage + '\n\n';  // Combine messages with line breaks
       if (sslInfo.daysUntilExpiry <= 30) {
         await sendSlackAlert(domain, sslInfo.daysUntilExpiry);
       }
     }
+
+    return alertMessage;  // Return the combined alert message
   } catch (error) {
     console.error(error);
   }
 }
 
 // Call the main function and handle unhandled promise rejections
-main().catch(error => {
+main().then(alertMessage => {
+  console.log(alertMessage);  // Print the combined alert message
+}).catch(error => {
   console.error('Unhandled promise rejection:', error);
 });
 
