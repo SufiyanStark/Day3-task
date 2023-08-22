@@ -1,4 +1,4 @@
-name: Check SSL Expiry
+name: Check SSL Expiry and Notify Slack
 
 on:
   schedule:
@@ -24,7 +24,13 @@ jobs:
       - name: Run SSL Expiry Check and Notify Slack
         run: |
           echo "Running SSL Expiry Check"
-          node /home/runner/work/Day3-task/Day3-task/.github/scripts/ssl_expiry_check_script.js
+
+          # Run your SSL expiry check script and capture its output
+          ssl_expiry_result=$(node .github/scripts/ssl_expiry_check_script.js)
+          echo "$ssl_expiry_result"  # Print the captured output
+
+          # Send Slack notification using the captured output
+          curl -X POST -H "Content-type: application/json" --data "{\"text\":\"$ssl_expiry_result\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
