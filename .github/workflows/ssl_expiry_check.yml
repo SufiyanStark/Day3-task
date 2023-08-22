@@ -28,16 +28,11 @@ jobs:
           # Run your SSL expiry check script and capture its output
           ssl_expiry_result=$(node .github/scripts/ssl_expiry_check_script.js)
 
-          # Iterate through the alerts and format the message
-          formatted_message=""
-          for item in $ssl_expiry_result; do
-            domain=$(echo "$item" | jq -r '.domain')
-            days=$(echo "$item" | jq -r '.daysUntilExpiry')
-            formatted_message+="Domain: $domain\nDays Until Expiry: $days\n\n"
-          done
+          # Remove the trailing newline and split alerts using separator
+          alerts=$(echo "$ssl_expiry_result" | sed -e '$ s/\n$//' | awk '{printf "%s", $0} END {print ""}' RS=)
 
           # Send Slack notification using the formatted message
-          curl -X POST -H "Content-type: application/json" --data "{\"text\":\"$formatted_message\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H "Content-type: application/json" --data "{\"text\":\"$alerts\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
