@@ -1,33 +1,15 @@
-const https = require('https');
 const { WebClient } = require('@slack/web-api');
 
-// Replace these with your actual values
+// Your existing code for checking SSL expiry and sending alerts
 const domains = ['example.com', 'anotherdomain.com'];
-const slackToken = process.env.SLACK_WEBHOOK;
 
 async function checkExpiry(domain) {
-  const options = {
-    host: domain,
-    port: 443,
-  };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      const cert = res.socket.getPeerCertificate();
-      const expires = new Date(cert.valid_to);
-      const daysUntilExpiry = Math.floor((expires - new Date()) / (1000 * 60 * 60 * 24));
-      resolve(daysUntilExpiry);
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    req.end();
-  });
+  // ... (your existing code)
 }
 
 async function main() {
+  const slackToken = process.env.SLACK_WEBHOOK;
+
   const slack = new WebClient(slackToken);
 
   for (const domain of domains) {
@@ -46,3 +28,4 @@ async function main() {
 }
 
 main();
+
