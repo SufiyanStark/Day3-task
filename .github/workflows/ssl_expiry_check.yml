@@ -2,26 +2,26 @@ name: SSL Expiry Check
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight UTC
-  workflow_dispatch: # Manually trigger the workflow
+    - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
-  ssl-expiry-check:
+  ssl_expiry_check:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Bash
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install bash
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-      - name: Run SSL Expiry Check Script
+      - name: Run SSL Expiry Check and Send Slack Alert
         run: |
-          chmod +x ssl_expiry_check.sh
-          ./ssl_expiry_check.sh
+          npm install
+          node ssl_expiry_check_script.js
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}  # Use the correct secret name
 
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
