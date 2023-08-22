@@ -8,7 +8,7 @@ async function checkExpiry(domain) {
 }
 
 async function main() {
-  const slackToken = process.env.SLACK_WEBHOOK;
+  const slackToken = process.env.SLACK_WEBHOOK_URL;
 
   const slack = new WebClient(slackToken);
 
