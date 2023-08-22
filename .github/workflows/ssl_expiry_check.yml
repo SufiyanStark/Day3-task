@@ -25,7 +25,7 @@ jobs:
           echo "Running SSL Expiry Check"
 
           # Run your SSL expiry check script and capture its output
-          ssl_expiry_result=$(node /path/to/ssl_expiry_check_script.js)
+          ssl_expiry_result=$(node home/ec2-user/Day3-task/.github/scripts/ssl_expiry_check_script.js)
 
           # Extract domain name and days until expiry from the result
           domain_name=$(echo "$ssl_expiry_result" | grep -o 'Domain : [^ ]*' | cut -d' ' -f3-)
