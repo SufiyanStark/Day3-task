@@ -1,0 +1,27 @@
+name: SSL Expiry Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+  workflow_dispatch: # Manually trigger the workflow
+
+jobs:
+  ssl-expiry-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Bash
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install bash
+
+      - name: Run SSL Expiry Check Script
+        run: |
+          chmod +x ssl_expiry_check.sh
+          ./ssl_expiry_check.sh
+
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
