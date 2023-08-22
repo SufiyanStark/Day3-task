@@ -1,3 +1,26 @@
+const axios = require('axios');
+const { promises: fs } = require('fs');
+const { promisify } = require('util');
+const { exec } = require('child_process');
+
+const execPromise = promisify(exec);
+
+async function getSSLCertificateInfo(domain) {
+  const { stdout, stderr } = await execPromise(`openssl s_client -connect ${domain}:443 -servername ${domain} < /dev/null 2>/dev/null | openssl x509 -text -noout`);
+
+  // Extract certificate expiration information from the output
+  const expirationMatch = /Not After : (.+)/.exec(stdout);
+  if (expirationMatch) {
+    const expirationDate = new Date(expirationMatch[1]);
+    const currentDate = new Date();
+    const daysUntilExpiry = Math.ceil((expirationDate - currentDate) / (1000 * 60 * 60 * 24));
+
+    return { daysUntilExpiry };
+  }
+
+  return { daysUntilExpiry: -1 }; // Return -1 if expiration information couldn't be retrieved
+}
+
 async function sendSlackAlert(domain, daysUntilExpiry) {
   const slackToken = process.env.SLACK_WEBHOOK_URL;
 
@@ -13,4 +36,28 @@ async function sendSlackAlert(domain, daysUntilExpiry) {
     console.error(`Error sending Slack alert for ${domain}:`, error);
   }
 }
+
+async function main() {
+  try {
+    const domains = await fs.readFile('/home/ec2-user/Day3-task/.github/scripts/domains.txt', 'utf-8');
+    const domainList = domains.split('\n').filter(domain => domain.trim() !== '');
+
+    for (const domain of domainList) {
+      const sslInfo = await getSSLCertificateInfo(domain);
+      console.log(`Domain: ${domain}`);
+      console.log(`Days Until Expiry: ${sslInfo.daysUntilExpiry}`);
+
+      if (sslInfo.daysUntilExpiry <= 30) {
+        await sendSlackAlert(domain, sslInfo.daysUntilExpiry);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Call the main function and handle unhandled promise rejections
+main().catch(error => {
+  console.error('Unhandled promise rejection:', error);
+});
 
