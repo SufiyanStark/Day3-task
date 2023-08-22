@@ -20,9 +20,8 @@ jobs:
 
       - name: Run SSL Expiry Check and Send Slack Alert
         run: |
-          cd scripts
           npm install
-          node ssl_expiry_check_script.js
+          node .github/scripts/ssl_expiry_check_script.js
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
