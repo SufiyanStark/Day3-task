@@ -23,13 +23,11 @@ jobs:
       - name: Print Environment Variables  # Debugging line
         run: env
 
-      - name: List Files in scripts Directory  # Debugging line
-        run: ls -R /home/runner/work/Day3-task/Day3-task/.github/scripts
-
       - name: Run SSL Expiry Check and Notify Slack
         run: |
           echo "Running SSL Expiry Check"
           node /home/runner/work/Day3-task/Day3-task/.github/scripts/ssl_expiry_check_script.js
+          echo "Script finished"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
