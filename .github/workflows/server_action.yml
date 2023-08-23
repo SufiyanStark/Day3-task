@@ -21,6 +21,8 @@ jobs:
 
     - name: Deploy to Server
       run: |
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
         ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 'bash -s' << 'EOF'
         # Commands to execute on the remote server
         echo "Hello from GitHub Actions on 18.232.61.210"
