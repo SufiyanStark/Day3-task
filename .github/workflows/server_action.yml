@@ -15,7 +15,7 @@ jobs:
 
       - name: Set up SSH
         run: |
-          mkdir -p /home/ubuntu/.ssh
+          sudo mkdir -p /home/ubuntu/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/ubuntu/.ssh/id_rsa
           chmod 600 /home/ubuntu/.ssh/id_rsa
           ssh-keyscan -t rsa 18.232.61.210 >> /home/ubuntu/.ssh/known_hosts
