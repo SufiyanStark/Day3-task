@@ -1,21 +1,27 @@
 name: Deploy to EC2
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Set up SSH agent
-      uses: webfactory/ssh-agent@v0.4.1
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Set up SSH keys
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 18.232.61.210 >> ~/.ssh/known_hosts
+
     - name: Deploy to EC2
       run: |
-        ssh -v -o StrictHostKeyChecking=no ec2-user@54.224.70.214 'bash -s' << EOF
+        ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 'bash -s' << EOF
         # Commands to execute on the EC2 instance
         echo "Hello from GitHub Actions!"
         EOF
