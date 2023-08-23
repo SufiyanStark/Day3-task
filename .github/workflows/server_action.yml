@@ -1,4 +1,4 @@
-name: Remote Task
+name: SSH into EC2 and Run Script
 
 on:
   push:
@@ -6,19 +6,18 @@ on:
       - main
 
 jobs:
-  run_remote_script:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.5.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-    - name: Run remote script
-      run: |
-        ssh ubuntu@18.232.61.210 'bash -s' < /home/runner/work/Day3-task/Day3-task/.github/scripts/your-local-script.sh
+      - name: Run remote script
+        run: |
+          echo "${KNOWN_HOSTS}" > known_hosts
+          chmod 600 known_hosts
+          ssh -o UserKnownHostsFile=known_hosts ubuntu@18.232.61.210 'bash -s' < /home/runner/work/Day3-task/Day3-task/.github/scripts/your-local-script.sh
+        env:
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
 
