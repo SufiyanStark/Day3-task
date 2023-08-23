@@ -1,4 +1,4 @@
-name: Server Actions
+name: Execute Tasks on Remote Server
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  execute_tasks:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,14 +14,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+      - name: Run tasks on remote server
         run: |
-          sudo mkdir -p /home/ubuntu/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/ubuntu/.ssh/id_rsa
-          chmod 600 /home/ubuntu/.ssh/id_rsa
-          ssh-keyscan -t rsa 18.232.61.210 >> /home/ubuntu/.ssh/known_hosts
-
-      - name: Navigate to script directory and execute
-        run: |
-          ssh ubuntu@18.232.61.210 'cd /home/ubuntu/Day3-task/.github/scripts && bash your-local-script.sh'
-
+          ssh ubuntu@18.232.61.210 'bash -s' < your-local-script.sh
 
