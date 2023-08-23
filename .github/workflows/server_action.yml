@@ -22,5 +22,5 @@ jobs:
 
       - name: Execute commands on server
         run: |
-          ssh ubuntu@18.232.61.210 'bash -s' < /home/ubuntu/Day3-task/.github/scripts/your-local-script.sh
+          ssh ubuntu@18.232.61.210 'bash -s' < ./Day3-task/.github/scripts/your-local-script.sh
 
