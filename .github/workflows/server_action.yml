@@ -20,12 +20,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa 18.232.61.210 >> ~/.ssh/known_hosts
 
-      - name: Print directory contents
+      - name: Navigate to script directory and execute
         run: |
-          ls -l /home/ubuntu/Day3-task/.github/scripts
-
-      - name: Execute commands on server
-        run: |
-          ssh ubuntu@18.232.61.210 'bash -s' < /home/ubuntu/Day3-task/.github/scripts/your-local-script.sh
-
+          ssh ubuntu@18.232.61.210 'cd /home/ubuntu/Day3-task/.github/scripts && bash your-local-script.sh'
 
