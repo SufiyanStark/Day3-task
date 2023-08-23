@@ -17,11 +17,9 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        cd ~/.ssh
         echo "$SSH_PRIVATE_KEY" > id_rsa
         chmod 600 id_rsa
         ssh -o StrictHostKeyChecking=no -v -i id_rsa ec2-user@54.224.70.214 'bash -s' << EOF
         # Your commands here
         EOF
-
 
