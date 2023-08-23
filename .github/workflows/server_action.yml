@@ -1,4 +1,4 @@
-name: Deploy to Server
+ name: Deploy to Server
 
 on:
   push:
@@ -14,10 +14,12 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 18.232.61.210 >> ~/.ssh/known_hosts
+        
     - name: Deploy to Server
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 'bash -s' << EOF
