@@ -20,8 +20,8 @@ jobs:
 
       - name: Run Server Action
         run: |
-          # Use SSH to execute commands on the server with debugging output
-          ssh -o StrictHostKeyChecking=no -v ec2-user@54.224.70.214 'bash -s' << EOF
+          # Use SSH to execute commands on the server
+          ssh -i ./root/.ssh/id_rsa -o StrictHostKeyChecking=no -v ec2-user@54.224.70.214 'bash -s' << EOF
           echo 'Hello from GitHub Actions'
           # Your other commands here
           EOF
