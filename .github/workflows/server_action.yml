@@ -1,4 +1,4 @@
-name: Deploy to Ubuntu
+name: Deploy to Server
 
 on:
   push:
@@ -12,16 +12,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.4.1
+      
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-    - name: Deploy to Ubuntu
+      
+    - name: Deploy to Server
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 'bash -s' << EOF
-        # Commands to execute on the Ubuntu instance
+        # Commands to execute on the remote server
         echo "Hello from GitHub Actions!"
         EOF
 
