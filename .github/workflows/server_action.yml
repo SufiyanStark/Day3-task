@@ -20,7 +20,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa 18.232.61.210 >> ~/.ssh/known_hosts
 
-      - name: Navigate to script directory and execute
+      - name: SSH Debugging
+        run: |
+          ssh -vvv ubuntu@18.232.61.210 'echo Debugging SSH Connection'
+
+      - name: Execute commands on server
         run: |
           ssh ubuntu@18.232.61.210 'cd /home/ubuntu/Day3-task/.github/scripts && bash your-local-script.sh'
 
