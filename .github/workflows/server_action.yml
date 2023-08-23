@@ -17,12 +17,12 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
         ssh-keyscan -H 18.232.61.210 >> ~/.ssh/known_hosts
 
     - name: Deploy to Server
       run: |
-        eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/id_rsa
         ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 << EOF
         # Commands to execute on the remote server
         echo "Hello from GitHub Actions on 18.232.61.210"
