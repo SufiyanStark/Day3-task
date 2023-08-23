@@ -1,27 +1,22 @@
 name: Deploy to EC2
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.4.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Deploy to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@54.224.70.214 'bash -s' << EOF
-          # Commands to execute on the EC2 instance
-          echo "Hello from GitHub Actions!"
-          EOF
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up SSH agent
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Deploy to EC2
+      run: |
+        ssh -v -o StrictHostKeyChecking=no ec2-user@YOUR_EC2_IP_ADDRESS 'bash -s' << EOF
+        # Commands to execute on the EC2 instance
+        echo "Hello from GitHub Actions!"
+        EOF
 
