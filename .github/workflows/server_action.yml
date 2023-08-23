@@ -1,4 +1,4 @@
-name: Deploy to Server
+name: Deploy to EC2
 
 on:
   push:
@@ -16,15 +16,18 @@ jobs:
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
-        cp .github/keys/* ~/.ssh/
+        cp /home/ec2-user/Day3-task/.github/keys/* ~/.ssh/
         chmod 600 ~/.ssh/id_rsa
         chmod 644 ~/.ssh/id_rsa.pub
         chmod 644 ~/.ssh/authorized_keys
 
-    - name: SSH into remote server and execute commands
+    - name: SSH into the server and run commands
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        SSH_AGENT_PID: $$
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
         ssh -o StrictHostKeyChecking=no -v ec2-user@54.224.70.214 'bash -s' << EOF
-        echo 'Hello from GitHub Actions'
-        # Your other commands here
+        # Your commands here
         EOF
 
