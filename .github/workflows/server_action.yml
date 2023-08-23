@@ -1,5 +1,4 @@
-name: Deploy to Server
-
+name: Deploy to Remote Server
 on:
   push:
     branches:
@@ -12,18 +11,17 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
-    - name: Set up SSH key
+
+    - name: Set up SSH agent
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 18.232.61.210 >> ~/.ssh/known_hosts
-        
-    - name: Deploy to Server
+        eval "$(ssh-agent -s)"
+        ssh-add /root/.ssh/id_rsa
+
+    - name: Deploy to Remote Server
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 'bash -s' << EOF
         # Commands to execute on the remote server
         echo "Hello from GitHub Actions!"
+        # Add more commands here if needed
         EOF
 
