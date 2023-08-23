@@ -13,21 +13,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        cp /home/ec2-user/Day3-task/.github/keys/* ~/.ssh/
-        chmod 600 ~/.ssh/id_rsa
-        chmod 644 ~/.ssh/id_rsa.pub
-        chmod 644 ~/.ssh/authorized_keys
-
     - name: SSH into the server and run commands
       env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        SSH_AGENT_PID: $$
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        ssh -o StrictHostKeyChecking=no -v ec2-user@54.224.70.214 'bash -s' << EOF
+        cd ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > id_rsa
+        chmod 600 id_rsa
+        ssh -o StrictHostKeyChecking=no -v -i id_rsa ec2-user@54.224.70.214 'bash -s' << EOF
         # Your commands here
         EOF
+
 
