@@ -8,18 +8,20 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
 
-    - name: SSH into the server and run commands
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      run: |
-        echo "$SSH_PRIVATE_KEY" > id_rsa
-        chmod 600 id_rsa
-        ssh -o StrictHostKeyChecking=no -v -i id_rsa ec2-user@54.224.70.214 'bash -s' << EOF
-        # Your commands here
-        EOF
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@54.224.70.214 'bash -s' << EOF
+          # Commands to execute on the EC2 instance
+          echo "Hello from GitHub Actions!"
+          EOF
 
