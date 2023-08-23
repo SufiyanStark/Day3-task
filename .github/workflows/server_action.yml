@@ -1,4 +1,4 @@
-name: SSH Deploy
+name: Deploy to Server
 
 on:
   push:
@@ -8,21 +8,20 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.5.1
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        known-hosts: ${{ secrets.KNOWN_HOSTS }}
-
+    
     - name: Use SSH to execute commands on the server
       run: |
-        ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa ec2-user@54.224.70.214 'bash -s' << EOF
+        ssh -o StrictHostKeyChecking=no -v ec2-user@54.224.70.214 'bash -s' << EOF
+        cd /root/.ssh/
         echo 'Hello from GitHub Actions'
         # Your other commands here
         EOF
+      shell: /usr/bin/bash -e {0}
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh-XXXXXXNgVNTe/agent.1745
+        SSH_AGENT_PID: 1746
 
