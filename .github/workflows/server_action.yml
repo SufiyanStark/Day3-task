@@ -15,16 +15,13 @@ jobs:
 
       - name: Set up SSH
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa 18.232.61.210 >> ~/.ssh/known_hosts
+          mkdir -p /home/ubuntu/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > /home/ubuntu/.ssh/id_rsa
+          chmod 600 /home/ubuntu/.ssh/id_rsa
+          ssh-keyscan -t rsa 18.232.61.210 >> /home/ubuntu/.ssh/known_hosts
 
-      - name: SSH Debugging
-        run: |
-          ssh -vvv ubuntu@18.232.61.210 'echo Debugging SSH Connection'
-
-      - name: Execute commands on server
+      - name: Navigate to script directory and execute
         run: |
           ssh ubuntu@18.232.61.210 'cd /home/ubuntu/Day3-task/.github/scripts && bash your-local-script.sh'
+
 
