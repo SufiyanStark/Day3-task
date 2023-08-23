@@ -9,19 +9,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up SSH agent
-      run: |
-        eval "$(ssh-agent -s)"
-        ssh-add /root/.ssh/id_rsa
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to Remote Server
-      run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 'bash -s' << EOF
-        # Commands to execute on the remote server
-        echo "Hello from GitHub Actions!"
-        # Add more commands here if needed
-        EOF
+      - name: Deploy to Remote Server
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@your_server_ip 'bash -s' << EOF
+          # Commands to execute on the remote server
+          echo "Hello from GitHub Actions!"
+          EOF
 
