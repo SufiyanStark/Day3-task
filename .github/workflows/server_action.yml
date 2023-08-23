@@ -1,4 +1,4 @@
-name: Execute Tasks on Remote Server
+name: Remote Task
 
 on:
   push:
@@ -6,19 +6,19 @@ on:
       - main
 
 jobs:
-  execute_tasks:
+  run_remote_script:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
-      - name: Run tasks on remote server
-        run: |
-          ssh ubuntu@18.232.61.210 'bash -s' < your-local-script.sh
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Run remote script
+      run: |
+        ssh ubuntu@18.232.61.210 'bash -s' < /home/ubuntu/Day3-task/.github/scripts/your-local-script.sh
 
