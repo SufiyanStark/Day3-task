@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  remote_script:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,9 +15,11 @@ jobs:
 
       - name: Run remote script
         run: |
-          echo "${KNOWN_HOSTS}" > known_hosts
-          chmod 600 known_hosts
-          ssh -o UserKnownHostsFile=known_hosts ubuntu@18.232.61.210 'bash -s' < /home/runner/work/Day3-task/Day3-task/.github/scripts/your-local-script.sh
-        env:
-          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+          # List of hostnames to check
+          hosts=("example1.com" "example2.com" "example3.com")
+          
+          # Loop through the hosts and print their names
+          for host in "${hosts[@]}"; do
+            echo "Host: $host"
+          done
 
