@@ -1,25 +1,21 @@
-name: Server Action
-
+name: Deploy to EC2
 on:
-  schedule:
-    - cron: "0 0 * * *"  # Run daily at midnight
-  workflow_dispatch:    # Allow manual triggering
-
+  push:
+    branches:
+      - main
 jobs:
-  perform-action:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Use the secret you created
-
-      - name: Run Server Action
-        run: |
-          # Use SSH to execute commands on the server
-          ssh ec2-user@54.224.70.214 "echo 'Hello from GitHub Actions'"
-
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up SSH agent
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ec2-user@54.224.70.214 'bash -s' << EOF
+        # Commands to execute on the EC2 instance
+        echo "Hello from GitHub Actions!"
+        EOF
