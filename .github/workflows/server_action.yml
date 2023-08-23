@@ -8,20 +8,22 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    
-    - name: Use SSH to execute commands on the server
+
+    - name: Setup SSH key
       run: |
-        ssh -o StrictHostKeyChecking=no -v ec2-user@54.224.70.214 'bash -s' << EOF
-        cd /root/.ssh/
+        mkdir -p /root/.ssh
+        echo "$SSH_PRIVATE_KEY" > /root/.ssh/id_rsa
+        chmod 600 /root/.ssh/id_rsa
+        chmod 700 /root/.ssh
+
+    - name: SSH into Server
+      run: |
+        ssh -o StrictHostKeyChecking=no -v -i /root/.ssh/id_rsa ec2-user@54.224.70.214 'bash -s' << EOF
         echo 'Hello from GitHub Actions'
         # Your other commands here
         EOF
-      shell: /usr/bin/bash -e {0}
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh-XXXXXXNgVNTe/agent.1745
-        SSH_AGENT_PID: 1746
 
