@@ -20,5 +20,5 @@ jobs:
 
     - name: Run remote script
       run: |
-        ssh ubuntu@18.232.61.210 'bash -s' < /home/ubuntu/Day3-task/.github/scripts/your-local-script.sh
+        ssh ubuntu@18.232.61.210 'bash -s' < /home/runner/work/Day3-task/Day3-task/.github/scripts/your-local-script.sh
 
