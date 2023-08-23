@@ -15,7 +15,7 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Deploy to EC2
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@157.42.195.250 'bash -s' << EOF
+        ssh -o StrictHostKeyChecking=no ec2-user@54.224.70.214 'bash -s' << EOF
         # Commands to execute on the EC2 instance
         echo "Hello from GitHub Actions!"
         EOF
