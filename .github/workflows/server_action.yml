@@ -1,4 +1,5 @@
-name: Deploy to Server
+name: Server Actions
+
 on:
   push:
     branches:
@@ -9,23 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/id_rsa
-        ssh-keyscan -H 18.232.61.210 >> ~/.ssh/known_hosts
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa 18.232.61.210 >> ~/.ssh/known_hosts
 
-    - name: Deploy to Server
-      run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@18.232.61.210 << EOF
-        # Commands to execute on the remote server
-        echo "Hello from GitHub Actions on 18.232.61.210"
-        # Add more commands as needed
-        EOF
-
+      - name: Execute commands on server
+        run: |
+          ssh ubuntu@18.232.61.210 'bash -s' < your-local-script.sh
